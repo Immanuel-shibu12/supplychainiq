@@ -1,0 +1,59 @@
+{
+  "run_at": "2026-10-25T16:12:23.403008+00:00",
+  "pandas": "2.2.2",
+  "orders": {
+    "rows_read": 180519,
+    "columns_read": 53,
+    "expected_columns_missing_filled_null": [],
+    "non_numeric_values_set_to_null": {},
+    "unparseable_dates": {
+      "order_date": 0,
+      "ship_date": 0
+    },
+    "rows_removed_missing_id": 0,
+    "rows_removed_duplicate_order_item_id": 0,
+    "rows_flagged_by_check": {
+      "negative_shipping_days": 0,
+      "bad_order_date": 0,
+      "bad_ship_date": 0,
+      "ship_before_order": 0,
+      "non_positive_quantity": 0,
+      "discount_rate_out_of_range": 0,
+      "status_risk_mismatch": 0
+    },
+    "invalid_values_set_to_null": {
+      "negative_shipping_days": 0
+    },
+    "columns_dropped_pii": [
+      "customer_email",
+      "customer_password",
+      "customer_fname",
+      "customer_lname",
+      "customer_street"
+    ],
+    "columns_dropped_mostly_null": {
+      "product_description": 1.0
+    },
+    "rows_loaded": 180519,
+    "null_counts_after_cleaning": {
+      "customer_zipcode": 3,
+      "order_zipcode": 155679
+    }
+  },
+  "clicks": {
+    "rows_read": 469977,
+    "unparseable_dates": 0,
+    "hour_filled_from_timestamp": 0,
+    "fields_recovered_from_url": {
+      "department": 0,
+      "category": 0,
+      "product": 0
+    },
+    "event_type_counts": {
+      "product_view": 469977
+    },
+    "rows_without_ip": 0,
+    "exact_duplicate_rows_kept": 3249,
+    "rows_loaded": 469977
+  }
+}

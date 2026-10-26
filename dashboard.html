@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupplyChainIQ — MongoDB Supply Chain & Omnichannel Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --accent: #818cf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(129, 140, 248, 0.10) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(52, 211, 153, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    header {
+      background: rgba(11, 17, 32, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .logo-badge svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+    }
+
+    .title-area h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-area p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .status-ribbon {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pill-green {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.3);
+      color: #6ee7b7;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      max-width: 1400px;
+      margin: 1.5rem auto 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      box-shadow: 0 -2px 8px var(--primary-glow);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      opacity: 0.6;
+    }
+
+    .kpi-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .kpi-sub.warning { color: #fca5a5; }
+    .kpi-sub.success { color: #86efac; }
+    .kpi-sub.info { color: #93c5fd; }
+
+    /* Content Panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+    }
+
+    .chart-card:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .chart-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .chart-img-container {
+      background: #0d1527;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .chart-img-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .chart-img-container:hover img {
+      transform: scale(1.02);
+    }
+
+    .chart-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .chart-desc strong {
+      color: #e2e8f0;
+    }
+
+    /* Benchmark Table */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow-x: auto;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
+    }
+
+    .code-pill {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: rgba(148, 163, 184, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      color: #e2e8f0;
+    }
+
+    .speedup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.12);
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+    }
+
+    /* Modal for Image Preview */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 12px;
+      border: 1px solid var(--border-accent);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Command Runner Block */
+    .cmd-box {
+      background: #080d1a;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: #93c5fd;
+    }
+
+    .cmd-title {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .cmd-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .cmd-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .copy-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--primary);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-family: var(--font);
+    }
+
+    .copy-btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        </div>
+        <div class="title-area">
+          <h1>SupplyChainIQ — Analytics Dashboard</h1>
+          <p>MongoDB Community Server 8.0 &bull; MapReduce &bull; Aggregation Pipeline &bull; Python 3.11</p>
+        </div>
+      </div>
+      <div class="status-ribbon">
+        <span class="pill pill-green"><span class="dot"></span> MongoDB: localhost:27017</span>
+        <span class="pill"><span class="dot" style="background:#38bdf8;"></span> DB: supplychainiq</span>
+        <span class="pill">12 MapReduce Jobs</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="openTab('tab-charts')">📊 Visual Analytics (Charts)</button>
+    <button class="tab-btn" onclick="openTab('tab-benchmark')">⚡ MapReduce vs. Aggregation</button>
+    <button class="tab-btn" onclick="openTab('tab-tables')">📋 Data Tables</button>
+    <button class="tab-btn" onclick="openTab('tab-commands')">💻 Pipeline Commands</button>
+  </div>
+
+  <main>
+    <!-- Executive KPI Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Total Order Items</div>
+        <div class="kpi-value">180,519</div>
+        <div class="kpi-sub info">100% Ingested & Cleaned</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Late Delivery Risk</div>
+        <div class="kpi-value" style="color:#f87171;">54.8%</div>
+        <div class="kpi-sub warning">95.3% in First Class Mode</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Gross Revenue</div>
+        <div class="kpi-value">$31.6M</div>
+        <div class="kpi-sub success">Western Europe Top ($5.05M)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Net Profit</div>
+        <div class="kpi-value">$3.81M</div>
+        <div class="kpi-sub success">12.03% Operating Margin</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Clickstream Logs</div>
+        <div class="kpi-value">469,977</div>
+        <div class="kpi-sub info">Peak Hour: 21:00 (30,749 hits)</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: CHARTS & VISUAL FINDINGS -->
+    <div id="tab-charts" class="tab-panel active">
+      <div class="charts-grid">
+
+        <!-- Chart 1 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Late Delivery Rate by Shipping Mode</div>
+            <span class="chart-tag">mr_late_by_mode</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/late_rate_by_mode.png')">
+            <img src="results/charts/late_rate_by_mode.png" alt="Late delivery rate by mode" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=late_rate_by_mode.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> <strong>First Class</strong> experiences a staggering <strong>95.3%</strong> late-delivery rate due to unrealistic 1-2 day scheduling targets, whereas <strong>Standard Class</strong> has the lowest delay rate at <strong>38.1%</strong>.
+          </p>
+        </div>
+
+        <!-- Chart 2 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Profit Distribution by Region</div>
+            <span class="chart-tag">mr_sales_by_region</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/profit_by_region.png')">
+            <img src="results/charts/profit_by_region.png" alt="Profit by region" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=profit_by_region.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Western Europe ($607k profit) and Central America ($586k profit) lead global earnings. Net total profit was positive across all 23 global operating territories.
+          </p>
+        </div>
+
+        <!-- Chart 3 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Profitability by Discount Bucket</div>
+            <span class="chart-tag">mr_discount_impact</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/discount_impact.png')">
+            <img src="results/charts/discount_impact.png" alt="Discount impact" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=discount_impact.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Profit per item drops from $23.89 in the 0-4% discount bucket to $18.12 in the 20-24% tier, while ~18.5% of all discounted items turn negative profit.
+          </p>
+        </div>
+
+        <!-- Chart 4 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Browsing vs. Revenue Share by Department</div>
+            <span class="chart-tag">Cross-Dataset Join</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/browsing_vs_sales.png')">
+            <img src="results/charts/browsing_vs_sales.png" alt="Browsing vs sales" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=browsing_vs_sales.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> High browse / low revenue conversion gap in <strong>fitness</strong> (16.3% of web page views vs. only 1.1% of revenue), while <strong>fan shop</strong> drives 46.5% of total sales.
+          </p>
+        </div>
+
+        <!-- Chart 5 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Browsing Activity by Hour of Day</div>
+            <span class="chart-tag">mr_clicks_by_hour</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/clicks_by_hour.png')">
+            <img src="results/charts/clicks_by_hour.png" alt="Clicks by hour" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=clicks_by_hour.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Web traffic surges in the evening, peaking at <strong>21:00 (9:00 PM)</strong> with 30,749 views, while dipping to a quiet low of 2,216 views at 03:00.
+          </p>
+        </div>
+
+        <!-- Chart 6 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">37-Month Revenue & Profit Trajectory</div>
+            <span class="chart-tag">mr_monthly_trend</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/monthly_trend.png')">
+            <img src="results/charts/monthly_trend.png" alt="Monthly trend" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=monthly_trend.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Monthly timeline spans Jan 2015 to Jan 2018. Highest historical monthly revenue was achieved in <strong>2017-09 ($976,908)</strong>.
+          </p>
+        </div>
+
+        <!-- Chart 7 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Top 10 vs. Bottom 10 Products by Profit</div>
+            <span class="chart-tag">mr_product_performance</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/top_bottom_products.png')">
+            <img src="results/charts/top_bottom_products.png" alt="Top bottom products" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=top_bottom_products.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Most profitable SKU is the <em>Field & Stream Sportsman 16 Gun Fire Safe</em> (+$731k profit); only 2 SKUs produced net negative profit (SOLE E25 and E35 ellipticals).
+          </p>
+        </div>
+
+        <!-- Chart 8 -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Delivery Status Distribution by Region</div>
+            <span class="chart-tag">mr_delivery_status_by_region</span>
+          </div>
+          <div class="chart-img-container" onclick="openModal('results/charts/delivery_status_by_region.png')">
+            <img src="results/charts/delivery_status_by_region.png" alt="Delivery status by region" onerror="this.src='https://placehold.co/600x340/111827/38bdf8?text=delivery_status_by_region.png'">
+          </div>
+          <p class="chart-desc">
+            <strong>Key Finding:</strong> Stacked share across all territories reveals consistent delivery outcome ratios with shipping cancellations hovering under 4.5% globally.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: BENCHMARKING -->
+    <div id="tab-benchmark" class="tab-panel">
+      <div class="table-container">
+        <h3 style="margin-bottom: 1rem; color: #fff;">⚡ MapReduce vs. Native Aggregation Pipeline Performance</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Cross-validated with MongoDB Shell (<span class="code-pill">03_validate_aggregation.js</span>) across 180,519 order documents and 469,977 clickstream events. Tolerance: &plusmn;0.02.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Analytical Query / Job</th>
+              <th>Collection</th>
+              <th>Output Keys</th>
+              <th>MapReduce Latency</th>
+              <th>Aggregation Pipeline</th>
+              <th>Speedup Factor</th>
+              <th>Parity Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Shipping Mode Late Risk</strong> (<span class="code-pill">mr_late_by_mode</span>)</td>
+              <td>orders</td>
+              <td>4</td>
+              <td>5.846 s</td>
+              <td><strong style="color:#38bdf8;">0.392 s</strong></td>
+              <td><span class="speedup-badge">🚀 14.9x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Hourly Browsing Traffic</strong> (<span class="code-pill">mr_clicks_by_hour</span>)</td>
+              <td>clicks</td>
+              <td>24</td>
+              <td>12.548 s</td>
+              <td><strong style="color:#38bdf8;">0.884 s</strong></td>
+              <td><span class="speedup-badge">🚀 14.2x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Regional Sales & Margins</strong> (<span class="code-pill">mr_sales_by_region</span>)</td>
+              <td>orders</td>
+              <td>23</td>
+              <td>7.644 s</td>
+              <td><strong style="color:#38bdf8;">0.732 s</strong></td>
+              <td><span class="speedup-badge">🚀 10.4x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Department Clicks Share</strong> (<span class="code-pill">mr_clicks_by_department</span>)</td>
+              <td>clicks</td>
+              <td>6</td>
+              <td>12.987 s</td>
+              <td><strong style="color:#38bdf8;">1.563 s</strong></td>
+              <td><span class="speedup-badge">🚀 8.3x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Monthly Sales Trend</strong> (<span class="code-pill">mr_monthly_trend</span>)</td>
+              <td>orders</td>
+              <td>37</td>
+              <td>7.260 s</td>
+              <td><strong style="color:#38bdf8;">1.137 s</strong></td>
+              <td><span class="speedup-badge">🚀 6.4x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Discount Profit Erosion</strong> (<span class="code-pill">mr_discount_impact</span>)</td>
+              <td>orders</td>
+              <td>6</td>
+              <td>6.611 s</td>
+              <td><strong style="color:#38bdf8;">1.599 s</strong></td>
+              <td><span class="speedup-badge">🚀 4.1x Faster</span></td>
+              <td><span class="pill pill-green">PASS (100% Match)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: DATA TABLES -->
+    <div id="tab-tables" class="tab-panel">
+      <div class="table-container">
+        <h3 style="margin-bottom: 1rem; color: #fff;">📦 Late-Delivery Rate by Shipping Mode</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Shipping Mode</th>
+              <th>Total Consignments (n)</th>
+              <th>Late Shipments</th>
+              <th>Late Rate (%)</th>
+              <th>Avg Delay Over Schedule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#f87171;">First Class</strong></td>
+              <td>27,814</td>
+              <td>26,513</td>
+              <td><strong>95.32%</strong></td>
+              <td>+1.00 Days</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#fbbf24;">Second Class</strong></td>
+              <td>35,216</td>
+              <td>26,987</td>
+              <td><strong>76.63%</strong></td>
+              <td>+1.99 Days</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#38bdf8;">Same Day</strong></td>
+              <td>9,737</td>
+              <td>4,454</td>
+              <td><strong>45.74%</strong></td>
+              <td>+0.48 Days</td>
+            </tr>
+            <tr>
+              <td><strong style="color:#34d399;">Standard Class</strong></td>
+              <td>107,752</td>
+              <td>41,023</td>
+              <td><strong>38.07%</strong></td>
+              <td>-0.00 Days</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-container">
+        <h3 style="margin-bottom: 1rem; color: #fff;">🌍 Top Regional Revenue & Profit Contribution</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Market</th>
+              <th>Region</th>
+              <th>Items (n)</th>
+              <th>Revenue ($)</th>
+              <th>Net Profit ($)</th>
+              <th>Profit Margin</th>
+              <th>Loss Item %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Europe</td><td><strong>Western Europe</strong></td><td>25,867</td><td>$5,056,355</td><td>$607,320</td><td>12.01%</td><td>18.71%</td></tr>
+            <tr><td>LATAM</td><td><strong>Central America</strong></td><td>27,174</td><td>$4,884,996</td><td>$586,567</td><td>12.01%</td><td>18.62%</td></tr>
+            <tr><td>LATAM</td><td><strong>South America</strong></td><td>14,184</td><td>$2,528,275</td><td>$315,502</td><td>12.48%</td><td>18.50%</td></tr>
+            <tr><td>Europe</td><td><strong>Northern Europe</strong></td><td>9,408</td><td>$1,864,435</td><td>$226,419</td><td>12.14%</td><td>18.48%</td></tr>
+            <tr><td>Europe</td><td><strong>Southern Europe</strong></td><td>9,030</td><td>$1,755,488</td><td>$221,344</td><td>12.61%</td><td>18.21%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: COMMANDS -->
+    <div id="tab-commands" class="tab-panel">
+      <div class="cmd-box">
+        <div class="cmd-title">Terminal Pipeline Commands (Reproduce Everything)</div>
+        <div class="cmd-line">
+          <span>py -3.11 01_ingest_clean.py --orders data/DataCoSupplyChainDataset.csv --logs data/tokenized_access_logs.csv --drop</span>
+          <button class="copy-btn" onclick="copyText('py -3.11 01_ingest_clean.py --orders data/DataCoSupplyChainDataset.csv --logs data/tokenized_access_logs.csv --drop')">Copy</button>
+        </div>
+        <div class="cmd-line">
+          <span>mongosh "mongodb://localhost:27017/supplychainiq" --file 02_mapreduce_jobs.js</span>
+          <button class="copy-btn" onclick="copyText('mongosh &quot;mongodb://localhost:27017/supplychainiq&quot; --file 02_mapreduce_jobs.js')">Copy</button>
+        </div>
+        <div class="cmd-line">
+          <span>mongosh "mongodb://localhost:27017/supplychainiq" --file 03_validate_aggregation.js</span>
+          <button class="copy-btn" onclick="copyText('mongosh &quot;mongodb://localhost:27017/supplychainiq&quot; --file 03_validate_aggregation.js')">Copy</button>
+        </div>
+        <div class="cmd-line">
+          <span>py -3.11 04_export_and_charts.py</span>
+          <button class="copy-btn" onclick="copyText('py -3.11 04_export_and_charts.py')">Copy</button>
+        </div>
+        <div class="cmd-line">
+          <span>py -3.11 -m http.server 8000</span>
+          <button class="copy-btn" onclick="copyText('py -3.11 -m http.server 8000')">Copy</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal for full-size chart view -->
+  <div id="imgModal" class="modal" onclick="closeModal()">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <img id="modalImg" class="modal-content" src="" alt="Enlarged chart">
+  </div>
+
+  <script>
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function openModal(imgSrc) {
+      const modal = document.getElementById('imgModal');
+      const img = document.getElementById('modalImg');
+      img.src = imgSrc;
+      modal.classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('imgModal').classList.remove('open');
+    }
+
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert('Copied to clipboard: ' + txt);
+    }
+  </script>
+</body>
+</html>

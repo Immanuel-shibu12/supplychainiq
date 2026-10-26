@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
+
+# Large raw datasets (download separately from Kaggle)
+Data/*.csv
+data/*.csv
+*.ndjson
+out/*.ndjson
+
+# Keep cleaning audit log
+!out/cleaning_log.json
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store

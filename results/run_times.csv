@@ -1,0 +1,13 @@
+job,aggregate,mapReduce
+mr_clicks_by_department,1.563,12.987
+mr_clicks_by_dow,,10.062
+mr_clicks_by_hour,0.884,12.548
+mr_delivery_status_by_region,,4.943
+mr_discount_impact,1.599,6.611
+mr_late_by_mode,0.392,5.846
+mr_monthly_trend,1.137,7.26
+mr_product_performance,,7.505
+mr_sales_by_department,,5.912
+mr_sales_by_region,0.732,7.644
+mr_segment_payment,,6.271
+mr_top_products_viewed,,13.002

@@ -1,0 +1,5 @@
+key,n,late,slip,shipping_canceled,late_rate_pct,avg_delay_days
+First Class,27814.0,26513.0,27814.0,1301.0,95.32,1.0
+Second Class,35216.0,26987.0,70109.0,1410.0,76.63,1.99
+Same Day,9737.0,4454.0,4657.0,444.0,45.74,0.48
+Standard Class,107752.0,41023.0,-441.0,4599.0,38.07,-0.0
